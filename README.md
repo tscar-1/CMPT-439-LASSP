@@ -2,7 +2,7 @@
 
 **Members**: Gary LaPicola, Haki Sallaku, Tahiya Azad, Thomas Scardino
 
-## What is ArtChain?
+## What is LASSP?
 LASSP is a Python-based program that allows the user to utilize various numerical computational methods to solve systems of equations, perform numerical differentiation, identify mins and maxes of nonlinear functions, and perform numerical integration.
 
 ## Methods
