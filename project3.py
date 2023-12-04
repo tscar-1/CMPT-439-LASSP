@@ -40,8 +40,6 @@ def gaussSeidel(augMtx, delta, flag):
         # copies the current solution to the previous solution for the next iteration
         prevSoln = np.copy(currSoln)
 
-import math
-
 def jacobi(augMtx, delta, flag):
     n = len(augMtx) # gets row size of augmented matrix
     prevSoln = [0] * n # initialization of starting approximation vector (set to [0, 0, 0] by default)
