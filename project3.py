@@ -22,7 +22,7 @@ def gaussSeidel(augMtx, delta, flag):
         # computes errors based on current and previous approximations
         for i in range(n):
             mae += abs(currSoln[i] - prevSoln[i])
-            rmse += (currSoln[i] - prevSoln[i]) ** 2
+            rmse += math.pow(currSoln[i] - prevSoln[i], 2)
         
         if flag == 1: # approximate mean absolute error
             if mae / n < delta:
@@ -42,8 +42,8 @@ def gaussSeidel(augMtx, delta, flag):
 
 def jacobi(augMtx, delta, flag):
     n = len(augMtx) # gets row size of augmented matrix
-    prevSoln = [0] * n # initialization of starting approximation vector (set to [0, 0, 0] by default)
-    currSoln = [0] * n # initialization of solution vector
+    prevSoln = np.zeros(n) # initialization of starting approximation vector (set to [0, 0, 0] by default)
+    currSoln = np.zeros(n) # initialization of solution vector
     
     # loop runs until specified stopping criteria is reached
     while True:
@@ -77,7 +77,7 @@ def jacobi(augMtx, delta, flag):
                 return currSoln
         
         # copies the current solution to the previous solution for the next iteration
-        prevSoln = currSoln.copy()
+        prevSoln = np.copy(currSoln)
   
 if __name__ == '__main__':
   main()
