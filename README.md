@@ -1,4 +1,4 @@
 # CMPT-439-LASSP
 
 
-**Members**: Haki Sallaku, Gary LaPicola, Tahiya Azad, Thomas Scardino
+**Members**: Gary LaPicola, Haki Sallaku, Tahiya Azad, Thomas Scardino
