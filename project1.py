@@ -5,7 +5,6 @@ import sympy as sp
 # Define symbolic variable for sympy
 x = sp.symbols("x")
 
-
 # Bisection method
 def bisection(x1, x2, delta, flag, func):
     def f_val(val):
@@ -183,24 +182,7 @@ class RootFindingApp(tk.Tk):
         super().__init__()
 
         self.title("THE LASS")
-        self.geometry("800x800")
-
-        # Project selection
-        self.project_label = tk.Label(self, text="Select Project:")
-        self.project_label.pack()
-        self.project_var = tk.StringVar(self)
-        self.project_var.set("Project 1")  # default value
-        self.project_menu = tk.OptionMenu(
-            self,
-            self.project_var,
-            "Project 1",
-            "Project 2",
-            "Project 3",
-            "Project 4",
-            "Project 5",
-            "Project 6",
-        )
-        self.project_menu.pack()
+        self.geometry("400x400")
 
         # Method selection
         self.method_label = tk.Label(self, text="Select Method:")
