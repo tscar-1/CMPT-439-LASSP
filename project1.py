@@ -5,6 +5,7 @@ import sympy as sp
 # Define symbolic variable for sympy
 x = sp.symbols("x")
 
+
 # Bisection method
 def bisection(x1, x2, delta, flag, func):
     def f_val(val):
@@ -186,60 +187,59 @@ class RootFindingApp(tk.Tk):
 
         # Method selection
         self.method_label = tk.Label(self, text="Select Method:")
-        self.method_label.pack()
+        self.method_label.grid(row=0, column=0, sticky="e")
         self.method_var = tk.StringVar(self)
-        self.method_var.set("bisection")  # default value
+        self.method_var.set("bisection")  # Set default value
         self.method_menu = tk.OptionMenu(
             self, self.method_var, "bisection", "secant", "false-position", "newton"
         )
-        self.method_menu.pack()
+        self.method_menu.grid(row=0, column=1)
 
         # Flag selection
         self.flag_label = tk.Label(self, text="Select Flag:")
-        self.flag_label.pack()
+        self.flag_label.grid(row=1, column=0, sticky="e")
         self.flag_var = tk.StringVar(self)
-        self.flag_var.set("1")  # default value
+        self.flag_var.set("1")  # Set default valu
         self.flag_menu = tk.OptionMenu(self, self.flag_var, "1", "2", "3")
-        self.flag_menu.pack()
+        self.flag_menu.grid(row=1, column=1)
 
         # Left Bracket Entry
         self.left_bracket_label = tk.Label(self, text="Left Bracket (x0):")
-        self.left_bracket_label.pack()
+        self.left_bracket_label.grid(row=2, column=0, sticky="e")
         self.left_bracket_entry = tk.Entry(self)
-        self.left_bracket_entry.pack()
+        self.left_bracket_entry.grid(row=2, column=1)
 
         # Right Bracket Entry
         self.right_bracket_label = tk.Label(self, text="Right Bracket (x1):")
-        self.right_bracket_label.pack()
+        self.right_bracket_label.grid(row=3, column=0, sticky="e")
         self.right_bracket_entry = tk.Entry(self)
-        self.right_bracket_entry.pack()
+        self.right_bracket_entry.grid(row=3, column=1)
 
         # Function selection
         self.function_label = tk.Label(self, text="Select Function:")
-        self.function_label.pack()
+        self.function_label.grid(row=4, column=0, sticky="e")
         self.function_var = tk.StringVar(self)
-        self.function_var.set("Function 1")  # default value
+        self.function_var.set("Function 1")  # Set default value to the first function
         self.function_menu = tk.OptionMenu(
             self, self.function_var, *predefined_functions.keys()
         )
-        self.function_menu.pack()
+        self.function_menu.grid(row=4, column=1, sticky="w")
 
         # Submit Button
         self.submit_button = tk.Button(self, text="Submit", command=self.find_root)
-        self.submit_button.pack()
+        self.submit_button.grid(row=5, column=0, columnspan=2)
 
+        # Trace method change to update the GUI accordingly
         self.method_var.trace("w", self.method_changed)
 
     def method_changed(self, *args):
         method = self.method_var.get()
         if method == "newton":
-            # Hide right bracket entry when Newton method is selected
-            self.right_bracket_label.pack_forget()
-            self.right_bracket_entry.pack_forget()
+            self.right_bracket_label.grid_remove()
+            self.right_bracket_entry.grid_remove()
         else:
-            # Show right bracket entry for all other methods
-            self.right_bracket_label.pack()
-            self.right_bracket_entry.pack()
+            self.right_bracket_label.grid()
+            self.right_bracket_entry.grid()
 
     def find_root(self):
         # Get user inputs
