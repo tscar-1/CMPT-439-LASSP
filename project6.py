@@ -1,15 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox
 import sympy as sp
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 x = sp.symbols("x")
 
 
 def goldenSectionmin(a, b, func):
     gs = 1.618
-    # Set the tolerance to 1e - 5
     delta = 0.000001
     iter = 0
     x1 = b - ((b - a) / gs)
@@ -37,11 +34,8 @@ def goldenSectionmin(a, b, func):
     return x_min, f_min, iter
 
 
-# Define the Golden Section to find max value
 def goldenSectionmax(a, b, func):
-    # The golden section ratio that is found Google
     gs = 1.618
-    # Set the tolerance to 1e - 5
     delta = 0.000001
     iter = 0
     x1 = b - ((b - a) / gs)
@@ -69,9 +63,7 @@ def goldenSectionmax(a, b, func):
     return x_max, f_max, iter
 
 
-# Define the Newton Method
 def newton_method(x0, func, func_prime, func_prime2):
-    # Set the tolerance to 1e - 5
     delta = 0.000001
     iter = 0
     while True:
@@ -95,7 +87,7 @@ predefined_functions = {
 }
 
 
-class findingaMinMax(tk.Tk):
+class FindingMinMax(tk.Tk):
     def __init__(self):
         super().__init__()
 
@@ -105,7 +97,7 @@ class findingaMinMax(tk.Tk):
         self.method_label = tk.Label(self, text="Select Method:")
         self.method_label.grid(row=0, column=0, sticky="e")
         self.method_var = tk.StringVar(self)
-        self.method_var.set("golden Section min")  # Set default value
+        self.method_var.set("golden Section min")
         self.method_menu = tk.OptionMenu(
             self,
             self.method_var,
@@ -116,34 +108,32 @@ class findingaMinMax(tk.Tk):
         )
         self.method_menu.grid(row=0, column=1)
 
-        # Left Bracket Entry
         self.left_bracket_label = tk.Label(self, text="Left Bracket (x0):")
-        self.left_bracket_label.grid(row=2, column=0, sticky="e")
+        self.left_bracket_label.grid(row=1, column=0, sticky="e")
         self.left_bracket_entry = tk.Entry(self)
-        self.left_bracket_entry.grid(row=2, column=1)
+        self.left_bracket_entry.grid(row=1, column=1)
 
-        # Right Bracket Entry
         self.right_bracket_label = tk.Label(self, text="Right Bracket (x1):")
-        self.right_bracket_label.grid(row=3, column=0, sticky="e")
+        self.right_bracket_label.grid(row=2, column=0, sticky="e")
         self.right_bracket_entry = tk.Entry(self)
-        self.right_bracket_entry.grid(row=3, column=1)
+        self.right_bracket_entry.grid(row=2, column=1)
 
-        # Function selection
         self.function_label = tk.Label(self, text="Select Function:")
-        self.function_label.grid(row=4, column=0, sticky="e")
+        self.function_label.grid(row=3, column=0, sticky="e")
         self.function_var = tk.StringVar(self)
-        self.function_var.set("Function 1")  # Set default value to the first function
+        self.function_var.set("Function 1")
         self.function_menu = tk.OptionMenu(
             self, self.function_var, *predefined_functions.keys()
         )
-        self.function_menu.grid(row=4, column=1, sticky="w")
+        self.function_menu.grid(row=3, column=1, sticky="w")
 
-        # Submit Button
         self.submit_button = tk.Button(self, text="Submit", command=self.find_min)
-        self.submit_button.grid(row=5, column=0, columnspan=2)
+        self.submit_button.grid(row=4, column=0, columnspan=2)
 
-        # Trace method change to update the GUI accordingly
         self.method_var.trace("w", self.method_changed)
+
+        # Start the Tkinter main event loop
+        self.mainloop()
 
     def method_changed(self, *args):
         method = self.method_var.get()
@@ -155,13 +145,11 @@ class findingaMinMax(tk.Tk):
             self.right_bracket_entry.grid()
 
     def find_min(self):
-        # Get user inputs
         method = self.method_var.get()
         left_bracket = float(self.left_bracket_entry.get())
         right_bracket = float(self.right_bracket_entry.get())
         selected_function = predefined_functions[self.function_var.get()]
 
-        # Create a lambda function for numerical evaluation
         func = sp.lambdify(x, selected_function, "numpy")
         func_prime = sp.lambdify(x, sp.diff(selected_function, x), "numpy")
         func_prime2 = sp.lambdify(x, sp.diff(sp.diff(selected_function, x), x), "numpy")
@@ -176,13 +164,12 @@ class findingaMinMax(tk.Tk):
                     left_bracket, right_bracket, func
                 )
             elif method == "newton min":
-                # You would need an entry to get the initial guess from the user for Newton's method
-                initial_guess = float(self.left_bracket_entry.get())  # Example
+                initial_guess = float(self.left_bracket_entry.get())
                 x_result, f_result, iter_result = newton_method(
                     initial_guess, func, func_prime, func_prime2
                 )
             elif method == "newton max":
-                # You need to implement Newton's method for finding max
+                # Implement Newton's method for finding max
                 pass
             else:
                 raise ValueError("Invalid method selected.")
@@ -193,3 +180,7 @@ class findingaMinMax(tk.Tk):
             )
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+
+# Instantiate the class to run the program
+FindingMinMax()
