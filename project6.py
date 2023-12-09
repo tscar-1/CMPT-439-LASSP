@@ -132,7 +132,6 @@ class FindingMinMax(tk.Tk):
 
         self.method_var.trace("w", self.method_changed)
 
-        # Start the Tkinter main event loop
         self.mainloop()
 
     def method_changed(self, *args):
@@ -145,16 +144,26 @@ class FindingMinMax(tk.Tk):
             self.right_bracket_entry.grid()
 
     def find_min(self):
-        method = self.method_var.get()
-        left_bracket = float(self.left_bracket_entry.get())
-        right_bracket = float(self.right_bracket_entry.get())
-        selected_function = predefined_functions[self.function_var.get()]
-
-        func = sp.lambdify(x, selected_function, "numpy")
-        func_prime = sp.lambdify(x, sp.diff(selected_function, x), "numpy")
-        func_prime2 = sp.lambdify(x, sp.diff(sp.diff(selected_function, x), x), "numpy")
-
+        # Initialize variables to None or some default value
+        x_result = None
+        f_result = None
+        iter_result = 0
         try:
+            method = self.method_var.get()
+            left_bracket = float(self.left_bracket_entry.get())
+            right_bracket = (
+                float(self.right_bracket_entry.get())
+                if self.right_bracket_entry.get() and "newton" not in method.lower()
+                else None
+            )
+            selected_function = predefined_functions[self.function_var.get()]
+
+            func = sp.lambdify(x, selected_function, "numpy")
+            func_prime = sp.lambdify(x, sp.diff(selected_function, x), "numpy")
+            func_prime2 = sp.lambdify(
+                x, sp.diff(sp.diff(selected_function, x), x), "numpy"
+            )
+
             if method == "golden section min":
                 x_result, f_result, iter_result = goldenSectionmin(
                     left_bracket, right_bracket, func
@@ -164,20 +173,36 @@ class FindingMinMax(tk.Tk):
                     left_bracket, right_bracket, func
                 )
             elif method == "newton min":
-                initial_guess = float(self.left_bracket_entry.get())
-                x_result, f_result, iter_result = newton_method(
-                    initial_guess, func, func_prime, func_prime2
-                )
+                if left_bracket is not None:
+                    x_result, f_result, iter_result = newton_method(
+                        left_bracket, func, func_prime, func_prime2
+                    )
+                else:
+                    raise ValueError(
+                        "Please enter a valid initial guess for Newton's method."
+                    )
             elif method == "newton max":
-                # Implement Newton's method for finding max
-                pass
+                if left_bracket is not None:
+                    x_result, f_result, iter_result = newton_method(
+                        left_bracket, func, func_prime, func_prime2
+                    )
+                else:
+                    raise ValueError(
+                        "Please enter a valid initial guess for Newton's method."
+                    )
             else:
                 raise ValueError("Invalid method selected.")
 
-            messagebox.showinfo(
-                "Result",
-                f"Optimal point: x = {x_result}, f(x) = {f_result}, iterations = {iter_result}",
-            )
+            if x_result is not None and f_result is not None:
+                messagebox.showinfo(
+                    "Result",
+                    f"x = {x_result}, f(x) = {f_result}, iterations = {iter_result}",
+                )
+            else:
+                messagebox.showwarning("Result", "No result was calculated.")
+
+        except ValueError as ve:
+            messagebox.showerror("Input Error", str(ve))
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
