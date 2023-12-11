@@ -15,55 +15,35 @@ def lagrange(value, data_points, f):
     return interpolated_value
 
 def numerical_differentiation(x, x_values, fx, h, flag):
-
     # Interpolate missing f(x) values if necessary
     if x not in x_values:
         interpolated_fx = lagrange(x, x_values, fx)
-        x_values.append(x)
-        fx.append(interpolated_fx)
+        x_values = list(x_values) + [x]
+        fx = list(fx) + [interpolated_fx]
 
         # Sort the vectors based on x values
         combined = sorted(zip(x_values, fx))
         x_values, fx = zip(*combined)
 
-    try:
-        # Find indices for necessary points
-        main = x_values.index(x)
-        jump = x_values.index(next((val for val in x_values if val == x + h), 0))
+    # Find indices for necessary points
+    main = x_values.index(x)
+    jump = x_values.index(next(filter(lambda val: val == x + h, x_values)))
+    dbl_jump = x_values.index(next(filter(lambda val: val == x + 2 * h, x_values), 0))
+    back = x_values.index(next(filter(lambda val: val == x - h, x_values), 0))
 
-        dbl_jump_candidates = [i for i, val in enumerate(x_values) if abs(val - (x + 2 * h)) < 1e-10]
-        dbl_jump = dbl_jump_candidates[0] if dbl_jump_candidates else 0
+    # Calculate the derivative based on the chosen method
+    # Forward difference formula
+    if flag == 'a':
+        return (fx[jump] - fx[main]) / h
+    # 3 points forward difference formula
+    elif flag == 'b':
+        return (-fx[dbl_jump] + 4 * fx[jump] - 3 * fx[main]) / (2 * h)
+    # 3 points centered difference formula
+    elif flag == 'c':
+        return (fx[jump] - fx[back]) / (2 * h)
 
-        back_candidates = [i for i, val in enumerate(x_values) if abs(val - (x - h)) < 1e-10]
-        back = back_candidates[0] if back_candidates else 0
-
-        # Calculate the derivative based on the chosen method
-        # Forward difference formula
-        if flag == 'a':
-            return (fx[jump] - fx[main]) / h
-        # 3 points forward difference formula
-        elif flag == 'b':
-            return (-fx[jump + 1] + 4 * fx[jump] - 3 * fx[main]) / (2 * h)
-            
-
-        # 3 points centered difference formula
-        elif flag == 'c':
-            if jump + 1 < len(fx) and back - 1 >= 0:
-                return (fx[jump + 1] - fx[back - 1]) / (2 * h)
-            else:
-                print("Insufficient data points for 3 points centered difference formula.")
-                return 0.0
-
-
-
-
-        print("Invalid flag. Please choose 'a', 'b', or 'c.")
-        return 0.0
-    except ValueError:
-        print(f"Error: x = {x} not found in x_values.")
-        return 0.0
-
-
+    print("Invalid flag. Please choose 'a', 'b', or 'c.")
+    return 0.0
 
 class NumericalDifferentiationGUI(tk.Tk):
     def __init__(self):
@@ -80,57 +60,49 @@ class NumericalDifferentiationGUI(tk.Tk):
         self.method_menu = tk.OptionMenu(self, self.method_var, "a", "b", "c")
         self.method_menu.grid(row=0, column=1)
 
-        # X Value Entry
-        self.x_label = tk.Label(self, text="Enter x value:")
-        self.x_label.grid(row=1, column=0, sticky="e")
-        self.x_entry = tk.Entry(self)
-        self.x_entry.grid(row=1, column=1)
-
-        # X Values Entry
-        self.x_values_label = tk.Label(self, text="Enter x values (comma-separated):")
-        self.x_values_label.grid(row=2, column=0, sticky="e")
-        self.x_values_entry = tk.Entry(self)
-        self.x_values_entry.grid(row=2, column=1)
-
-        # FX Values Entry
-        self.fx_values_label = tk.Label(self, text="Enter fx values (comma-separated):")
-        self.fx_values_label.grid(row=3, column=0, sticky="e")
-        self.fx_values_entry = tk.Entry(self)
-        self.fx_values_entry.grid(row=3, column=1)
-
-        # H Value Entry
-        self.h_label = tk.Label(self, text="Enter h value:")
-        self.h_label.grid(row=4, column=0, sticky="e")
-        self.h_entry = tk.Entry(self)
-        self.h_entry.grid(row=4, column=1)
+        # X value
+        self.x_value = 0.26
 
         # Submit Button
         self.submit_button = tk.Button(self, text="Submit", command=self.perform_numerical_diff)
-        self.submit_button.grid(row=5, column=0, columnspan=2)
+        self.submit_button.grid(row=1, column=0, columnspan=2)
+
+        # Result Text Box
+        self.result_text = tk.Text(self, height=3, width=30)
+        self.result_text.grid(row=2, column=0, columnspan=2)
 
     def perform_numerical_diff(self):
         try:
             # Get user inputs
             method = self.method_var.get()
-            x_value = float(self.x_entry.get())
-            x_values = [float(x) for x in self.x_values_entry.get().split(",")]
-            fx_values = [float(fx) for fx in self.fx_values_entry.get().split(",")]
-            h_value = float(self.h_entry.get())
+
+            # Data points and f(x) values for interpolation
+            x_values = [0.15, 0.21, 0.23, 0.27, 0.32, 0.35]
+            fx_values = [0.1761, 0.3222, 0.3617, 0.4314, 0.5051, 0.5441]
+
+            # Step size for numerical differentiation
+            h_step = 0.01
+
+            # Perform interpolation for missing f(x) values
+            for val in [self.x_value, self.x_value + h_step, self.x_value - h_step, self.x_value + 2 * h_step]:
+                if val not in x_values:
+                    interpolated_fx = lagrange(val, x_values, fx_values)
+                    x_values = list(x_values) + [val]
+                    fx_values = list(fx_values) + [interpolated_fx]
+
+                    # Sort the vectors based on x values
+                    combined = sorted(zip(x_values, fx_values))
+                    x_values, fx_values = zip(*combined)
 
             # Perform numerical differentiation
-            derivative_value = numerical_differentiation(x_value, x_values, fx_values, h_value, method)
+            derivative_value = numerical_differentiation(self.x_value, x_values, fx_values, h_step, method)
 
-            # Show result in a new window
-            self.show_result(x_value, derivative_value)
+            # Display result in the text box
+            result_str = f"The derivative at x = {self.x_value} is: {derivative_value}"
+            self.result_text.delete(1.0, tk.END)  # Clear previous content
+            self.result_text.insert(tk.END, result_str)
         except ValueError:
             messagebox.showerror("Error", "Invalid input. Please enter numeric values.")
-
-    def show_result(self, x_value, derivative_value):
-        result_window = tk.Toplevel(self)
-        result_window.title("Result")
-
-        result_label = tk.Label(result_window, text=f"The derivative at x = {x_value} is: {derivative_value}")
-        result_label.pack()
 
 if __name__ == "__main__":
     app = NumericalDifferentiationGUI()
